@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Street View side-by-side</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .map_ui_body {
+
+      }
+      #map {
+        float: left;
+        width: 100%;
+      }
+      .map_panel {
+        width: 100%;
+        min-width: 100%;
+        height:40%;
+      }
+      .compare_panel {
+        height:55%;
+      }
+      .compare_content {
+        width: 50%;
+        float:left;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      #current_image {
+        background-repeat: no-repeat;
+        background-size: contain;
+        flex-grow: 1;
+      }
+      .footer {
+        /*flex-shrink: 1;*/
+      }
+    </style>
+  </head>
+  <body class="map_ui_body">
+    <div id="map" class="map_panel"></div>
+    <div class="compare_panel">
+      <div id="pano" class="compare_content"></div>
+      <div id="current_image_panel" class="compare_content">
+        <div id="original_gps">
+          <label for="original_latitude">latitude:</label>
+          <span id="original_latitude"></span>
+          <label for="original_longitude">longitude:</label>
+          <span id="original_longitude"></span>
+        </div>
+        <div id="current_image"></div>
+      </div>
+    </div>
+    <div id="footer" class="footer">
+      <form>
+        <input id="upload_image" type="file"/>
+      </form>
+    </div>
+    <script>
+      var map;
+      var map_data;
+      var panorama;
+
+      function initialize() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 0, lng: 0},
+          zoom: 2
+        });
+        panorama = new google.maps.StreetViewPanorama(
+            document.getElementById('pano'), {
+              position: {lat: -22.93503333, lng: -43.20122778},
+              pov: {
+                heading: 34,
+                pitch: 10
+              }
+        });
+        map.setStreetView(panorama);
+        var controlDiv = document.createElement('div');
+
+
+        $(document).ready(function() {
+        });
+
+        $('#upload_image').change(function() {
+          loadImage(this);
+        });
+        function loadImage(input) {
+          console.log(input);
+          if (input.files && input.files[0]) {
+            //TODO lots of nested callbacks - fix
+            var reader = new FileReader();
+            reader.onload = function() {
+              var image = new Image();
+              image.onload = function() {
+                // TODO switch to piexif.js
+                EXIF.getData(image, function() {
+                  console.log('latitude:'+EXIF.getTag(this, 'GPSLatitude'));
+                  $('#original_latitude').text(EXIF.getTag(this, 'GPSLatitude') + ' ' + EXIF.getTag(this, 'GPSLatitudeRef'));
+                  $('#original_longitude').text(EXIF.getTag(this, 'GPSLongitude') + ' ' + EXIF.getTag(this, 'GPSLongitudeRef'));
+                  console.log(EXIF.getTag(this, 'Orientation'))
+                });
+                //set image - TODO use exif data to rotate it
+                $('#current_image').css('background-image', 'url("'+this.src+'")');
+              }
+              image.src = reader.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+          }
+        }
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.1.0.js" integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk=" crossorigin="anonymous"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBl4fSPJ0kmCA_fl_rzpp13GXNWqE8Y8uw&callback=initialize"
+    async defer></script>
+    <script type="text/javascript" src="lib/js/exif.js"></script>
+  </body>
+</html>
