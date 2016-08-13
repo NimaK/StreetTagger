@@ -94,19 +94,37 @@
             //TODO lots of nested callbacks - fix
             var reader = new FileReader();
             reader.onload = function() {
-              var image = new Image();
-              image.onload = function() {
-                // TODO switch to piexif.js
-                EXIF.getData(image, function() {
-                  console.log('latitude:'+EXIF.getTag(this, 'GPSLatitude'));
-                  $('#original_latitude').text(EXIF.getTag(this, 'GPSLatitude') + ' ' + EXIF.getTag(this, 'GPSLatitudeRef'));
-                  $('#original_longitude').text(EXIF.getTag(this, 'GPSLongitude') + ' ' + EXIF.getTag(this, 'GPSLongitudeRef'));
-                  console.log(EXIF.getTag(this, 'Orientation'))
-                });
-                //set image - TODO use exif data to rotate it
-                $('#current_image').css('background-image', 'url("'+this.src+'")');
+              var exifData = piexif.load(reader.result);
+              var lat = dmsToDecimal(exifData.GPS[piexif.GPSIFD.GPSLatitude], exifData.GPS[piexif.GPSIFD.GPSLatitudeRef]);
+              var lng = dmsToDecimal(exifData.GPS[piexif.GPSIFD.GPSLongitude], exifData.GPS[piexif.GPSIFD.GPSLongitudeRef]);
+              var orientation = exifData['0th'][piexif.ImageIFD.Orientation];
+              console.log(lat +', ' + lng);
+              if ((lat == null) || (lng == null)) {
+                  // TODO
+                  console.log('handle geotagless photo');
+                  $('#original_latitude').text('None');
+                  $('#original_longitude').text('None');
               }
+              $('#original_latitude').text(lat);
+              $('#original_longitude').text(lng);
+              var image = new Image();
               image.src = reader.result;
+              //set image - TODO use exif data to rotate it
+              $('#current_image').css('background-image', 'url("'+image.src+'")');
+              var rotateBy = '';
+              if (orientation !== 1) {
+                  console.log(orientation);
+                  if (orientation === 3) {
+                      rotateBy = '180deg';
+                  }
+                  else if (orientation === 6) {
+                      rotateBy = '90deg';
+                  }
+                  else if (orientation === 8) {
+                      rotateBy = '-90deg';
+                  }
+                  $('#current_image').css('transform', 'rotate('+rotateBy+')');
+              }
             }
             reader.readAsDataURL(input.files[0]);
           }
@@ -116,6 +134,7 @@
     <script src="https://code.jquery.com/jquery-3.1.0.js" integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk=" crossorigin="anonymous"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBl4fSPJ0kmCA_fl_rzpp13GXNWqE8Y8uw&callback=initialize"
     async defer></script>
-    <script type="text/javascript" src="lib/js/exif.js"></script>
+    <script type="text/javascript" src="/js/coord-util.js"></script>
+    <script type="text/javascript" src="/lib/js/piexif.js"></script>
   </body>
 </html>
