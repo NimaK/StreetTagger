@@ -36,41 +36,54 @@
         background-size: contain;
         flex-grow: 1;
       }
+      #editable_coords {
+        display: none;
+      }
       .footer {
         /*flex-shrink: 1;*/
       }
     </style>
   </head>
   <body class="map_ui_body">
+    <!-- TOP half: map -->
     <div id="map" class="map_panel"></div>
+    <!-- BOTTOM half: comparison view -->
     <div class="compare_panel">
       <div id="pano" class="compare_content"></div>
       <div id="current_image_panel" class="compare_content">
-        <div id="original_gps">
+        <div id="original_coords">Original
           <label for="original_latitude">latitude:</label>
-          <span id="original_latitude"></span>
+          <span id="original_latitude" data-bind="text: origLat"></span>
           <label for="original_longitude">longitude:</label>
-          <span id="original_longitude"></span>
+          <span id="original_longitude" data-bind="text: origLng"></span>
+        </div>
+        <div id="editable_coords">New
+          <label for="new_latitude">latitude:</label>
+            <input id="new_latitude" data-bind="value: newLat"/>
+          <label for="new_longitude">longitude:</label>
+            <input id="new_longitude" data-bind="value: newLng"/>
         </div>
         <div id="current_image"></div>
       </div>
     </div>
     <div id="footer" class="footer">
       <form>
-        <input id="upload_image" type="file"/>
+        <input id="upload_image" type="file" data-bind="event: {change: uploadEvent}"/>
+        <input id="download_image" type="button" data-bind="enable: isEdited, event: {click: downloadImage}" value="Download"/>
+        <div id="download_div" style="display: none"></div>
       </form>
     </div>
     <script>
       var map;
       var map_data;
-      var panorama;
+      var streetview;
 
       function initialize() {
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 0, lng: 0},
           zoom: 2
         });
-        panorama = new google.maps.StreetViewPanorama(
+        streetview = new google.maps.StreetViewPanorama(
             document.getElementById('pano'), {
               position: {lat: -22.93503333, lng: -43.20122778},
               pov: {
@@ -78,7 +91,7 @@
                 pitch: 10
               }
         });
-        map.setStreetView(panorama);
+        map.setStreetView(streetview);
         var controlDiv = document.createElement('div');
 
 
@@ -86,55 +99,17 @@
         });
 
         $('#upload_image').change(function() {
+            console.log('jquery change event');
           loadImage(this);
         });
-        function loadImage(input) {
-          console.log(input);
-          if (input.files && input.files[0]) {
-            //TODO lots of nested callbacks - fix
-            var reader = new FileReader();
-            reader.onload = function() {
-              var exifData = piexif.load(reader.result);
-              var lat = dmsToDecimal(exifData.GPS[piexif.GPSIFD.GPSLatitude], exifData.GPS[piexif.GPSIFD.GPSLatitudeRef]);
-              var lng = dmsToDecimal(exifData.GPS[piexif.GPSIFD.GPSLongitude], exifData.GPS[piexif.GPSIFD.GPSLongitudeRef]);
-              var orientation = exifData['0th'][piexif.ImageIFD.Orientation];
-              console.log(lat +', ' + lng);
-              if ((lat == null) || (lng == null)) {
-                  // TODO
-                  console.log('handle geotagless photo');
-                  $('#original_latitude').text('None');
-                  $('#original_longitude').text('None');
-              }
-              $('#original_latitude').text(lat);
-              $('#original_longitude').text(lng);
-              var image = new Image();
-              image.src = reader.result;
-              //set image - TODO use exif data to rotate it
-              $('#current_image').css('background-image', 'url("'+image.src+'")');
-              var rotateBy = '';
-              if (orientation !== 1) {
-                  console.log(orientation);
-                  if (orientation === 3) {
-                      rotateBy = '180deg';
-                  }
-                  else if (orientation === 6) {
-                      rotateBy = '90deg';
-                  }
-                  else if (orientation === 8) {
-                      rotateBy = '-90deg';
-                  }
-                  $('#current_image').css('transform', 'rotate('+rotateBy+')');
-              }
-            }
-            reader.readAsDataURL(input.files[0]);
-          }
-        }
       }
     </script>
     <script src="https://code.jquery.com/jquery-3.1.0.js" integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk=" crossorigin="anonymous"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBl4fSPJ0kmCA_fl_rzpp13GXNWqE8Y8uw&callback=initialize"
     async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
     <script type="text/javascript" src="/js/coord-util.js"></script>
+    <script type="text/javascript" src="/js/geotag_edit_tool.js"></script>
     <script type="text/javascript" src="/lib/js/piexif.js"></script>
   </body>
 </html>

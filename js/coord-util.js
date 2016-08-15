@@ -16,3 +16,26 @@ function dmsToDecimal(dmsArray, direction) {
     
     return degrees;
 }
+
+function decimalToDms(decDegrees, isLat) {
+    var dmsArray = [];
+    var direction;
+    
+    if (decDegrees < 0) {
+        direction = isLat ? 'S' : 'W';
+        decDegrees = decDegrees * -1;
+    }
+    else {
+        direction = isLat ? 'N' : 'E';
+    }
+    
+    var deg = Math.floor(decDegrees);
+    var min = Math.floor(60 * (decDegrees - deg));
+    var sec = (3600 * (decDegrees - deg)) - (60 * min);
+    
+    dmsArray.push([deg, 1]);
+    dmsArray.push([min, 1]);
+    dmsArray.push([sec * 100, 100]);
+    
+    return {'DMS': dmsArray, 'direction': direction};
+}
