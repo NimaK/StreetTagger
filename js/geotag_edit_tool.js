@@ -88,6 +88,7 @@ function CoordEditorViewModel() {
         var dl = $('<a>')
             .attr('href', newImage)
             .attr('download', this.filename);
+        $('#download_div').empty().append(dl);
         dl[0].click();
     }
     

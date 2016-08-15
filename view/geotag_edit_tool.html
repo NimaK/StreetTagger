@@ -67,11 +67,9 @@
       </div>
     </div>
     <div id="footer" class="footer">
-      <form>
         <input id="upload_image" type="file" data-bind="event: {change: uploadEvent}"/>
         <input id="download_image" type="button" data-bind="enable: isEdited, event: {click: downloadImage}" value="Download"/>
         <div id="download_div" style="display: none"></div>
-      </form>
     </div>
     <script>
       var map;
@@ -98,10 +96,6 @@
         $(document).ready(function() {
         });
 
-        $('#upload_image').change(function() {
-            console.log('jquery change event');
-          loadImage(this);
-        });
       }
     </script>
     <script src="https://code.jquery.com/jquery-3.1.0.js" integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk=" crossorigin="anonymous"></script>
