@@ -82,13 +82,13 @@
           zoom: 2
         });
         streetview = new google.maps.StreetViewPanorama(
-            document.getElementById('pano'), {
+            document.getElementById('pano')/*, {
               position: {lat: -22.93503333, lng: -43.20122778},
               pov: {
                 heading: 34,
                 pitch: 10
               }
-        });
+        }*/);
         map.setStreetView(streetview);
         var controlDiv = document.createElement('div');
 

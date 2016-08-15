@@ -7,6 +7,7 @@ function CoordEditorViewModel() {
     this.orientation = ko.observable();
     
     this.isEdited = ko.observable(false);
+    this.hasGeotags = ko.observable(false);
     
     this.origPosMarker = null;
     this.origPosMarkerPano = null;
@@ -18,7 +19,6 @@ function CoordEditorViewModel() {
     this.filename = null;
     
     this.newLat.subscribe(function(newLatVal) {
-        console.log('my newLat subscription function');
         this.isEdited(true);
         // TODO form validation on newLat field - does not belong here...?
         if (viewModel.editableMarker) {
@@ -47,8 +47,34 @@ function CoordEditorViewModel() {
         }
     }, viewModel);
     
+    this.reset = function() {
+        this.origPosMarker && this.origPosMarker.setMap(null);
+        this.origPosMarkerPano && this.origPosMarkerPano.setMap(null);
+        this.editableMarker && this.editableMarker.setMap(null);
+        this.editableMarkerPano && this.editableMarkerPano.setMap(null);
+        
+        this.origPosMarker = null;
+        this.origPosMarkerPano = null;
+        this.editableMarker = null;
+        this.editableMarkerPano = null;
+        
+        this.origLat(null);
+        this.origLng(null);
+        this.newLat(null);
+        this.newLng(null);
+        this.orientation(null);
+
+        this.exifData = null;
+        this.image = null;
+        this.filename = null;
+        this.isEdited(false);
+        
+        clearCurrentImageDisplay();
+    }
+    
     this.uploadEvent = function(viewmodel, event) {
         var uploadInput = event.target;
+        viewmodel.reset();
         if (uploadInput.files && uploadInput.files[0]) {
             var file = event.target.files[0];
             viewmodel.filename = file.name;
@@ -59,7 +85,13 @@ function CoordEditorViewModel() {
     }
     
     this.loadData = function(fileReader) {
-        this.exifData = piexif.load(fileReader.result);
+        try {
+            this.exifData = piexif.load(fileReader.result);
+        } catch(e) {
+            console.log('Error: invalid file type');
+            alert('Error reading file');
+            throw new TypeError('Invalid file');
+        }
         var lat = dmsToDecimal(this.exifData.GPS[piexif.GPSIFD.GPSLatitude], this.exifData.GPS[piexif.GPSIFD.GPSLatitudeRef]);
         var lng = dmsToDecimal(this.exifData.GPS[piexif.GPSIFD.GPSLongitude], this.exifData.GPS[piexif.GPSIFD.GPSLongitudeRef]);
         var orientation = this.exifData['0th'][piexif.ImageIFD.Orientation];
@@ -69,6 +101,7 @@ function CoordEditorViewModel() {
         viewModel.newLat(lat);
         viewModel.newLng(lng);
         viewModel.orientation(orientation);
+        viewModel.hasGeotags((lat && lng) ? true : false);
     }
     
     this.downloadImage = function() {
@@ -95,7 +128,19 @@ function CoordEditorViewModel() {
     function onFileReaderLoad() {
         viewModel.loadData(this);
         
-        var markers = setupMapViews({lat: viewModel.origLat(), lng: viewModel.origLng()}, 12);
+        var pos, zoom;
+        if (!viewModel.hasGeotags()) {
+            pos = map.getCenter();
+            zoom = map.getZoom();
+            viewModel.newLat(pos.lat());
+            viewModel.newLng(pos.lng());
+        }
+        else {
+            pos = {lat: viewModel.origLat(), lng: viewModel.origLng()};
+            zoom = 12;
+        }
+        
+        var markers = setupMapViews(pos, zoom, viewModel.hasGeotags());
         viewModel.origPosMarker = markers.origPosMarker;
         viewModel.origPosMarkerPano = markers.origPosMarkerPano;
         viewModel.editableMarker = markers.editableMarker;
@@ -115,21 +160,23 @@ function CoordEditorViewModel() {
 
 ko.applyBindings(new CoordEditorViewModel());
 
-function setupMapViews(pos, zoom) {
+function setupMapViews(pos, zoom, hasOrigPos) {
     map.panTo(pos);
     map.setZoom(zoom);
     streetview.setPosition(pos);
     
-    var origPosMarker = new google.maps.Marker({
-        position:pos, 
-        map: map, 
-        title: 'Original Position'
-    });
-    var origPosMarkerPano = new google.maps.Marker({
-        position:pos, 
-        map: streetview, 
-        title: 'Original Position'
-    });
+    if (hasOrigPos) {
+        var origPosMarker = new google.maps.Marker({
+            position:pos, 
+            map: map, 
+            title: 'Original Position'
+        });
+        var origPosMarkerPano = new google.maps.Marker({
+            position:pos, 
+            map: streetview, 
+            title: 'Original Position'
+        });
+    }
     var editableMarker = new google.maps.Marker({
         position:pos, 
         map: map,
@@ -172,4 +219,9 @@ function updateCurrentImageDisplay(image, imageProps) {
 //        }
         $('#current_image').css('transform', 'rotate('+rotateBy+')');
     }
+}
+
+function clearCurrentImageDisplay() {
+    $('#editable_coords').hide();
+    $('#current_image').css('background-image', 'none');
 }
