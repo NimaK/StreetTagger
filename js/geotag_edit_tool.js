@@ -196,6 +196,7 @@ function setupMapViews(pos, zoom, hasOrigPos) {
 }
 
 function updateCurrentImageDisplay(image, imageProps) {
+    $('#original_coords').show();
     $('#editable_coords').show();
     
     // display the uploaded image
@@ -222,6 +223,7 @@ function updateCurrentImageDisplay(image, imageProps) {
 }
 
 function clearCurrentImageDisplay() {
+    $('#original_coords').hide();
     $('#editable_coords').hide();
     $('#current_image').css('background-image', 'none');
 }
