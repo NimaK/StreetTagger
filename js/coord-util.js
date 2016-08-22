@@ -39,3 +39,10 @@ function decimalToDms(decDegrees, isLat) {
     
     return {'DMS': dmsArray, 'direction': direction};
 }
+
+function formatCoord(degrees) {
+    if (degrees == undefined) {
+        return null;
+    }
+    return degrees.toFixed(8);
+}

@@ -66,15 +66,15 @@
       <div id="current_image_panel" class="compare_content">
         <div id="original_coords" class="coord_pair">Original
           <label for="original_latitude">latitude:</label>
-          <span id="original_latitude" data-bind="text: origLat"></span>
+          <span id="original_latitude" data-bind="text: formatCoord(origLat())"></span>
           <label for="original_longitude">longitude:</label>
-          <span id="original_longitude" data-bind="text: origLng"></span>
+          <span id="original_longitude" data-bind="text: formatCoord(origLng())"></span>
         </div>
         <div id="editable_coords" class="coord_pair">New
           <label for="new_latitude">latitude:</label>
-            <input id="new_latitude" type="number" data-bind="value: newLat"/>
+            <input id="new_latitude" type="number" step="0.00000001" data-bind="value: formatCoord(newLat())"/>
           <label for="new_longitude">longitude:</label>
-            <input id="new_longitude" type="number" data-bind="value: newLng"/>
+            <input id="new_longitude" type="number" step="0.00000001" data-bind="value: formatCoord(newLng())"/>
         </div>
         <div id="current_image"></div>
       </div>
