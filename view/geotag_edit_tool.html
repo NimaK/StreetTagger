@@ -44,12 +44,13 @@
       .coord_pair {
         padding: 0.2em;
       }
-      .coord_pair>input {
+      .coord_pair > input {
         width: 8em;
       }
       #current_image {
         background-repeat: no-repeat;
         background-size: contain;
+        background-position: center center;
         flex-grow: 1;
       }
       #original_coords, #editable_coords {
@@ -70,13 +71,16 @@
     <div class="compare_panel">
       <div id="pano" class="compare_content"></div>
       <div id="current_image_panel" class="compare_content">
-        <div id="original_coords" class="coord_pair">Original
+        <div id="compare_heading">Image Coordinates</div>
+        <div id="original_coords" class="coord_pair">
+          <span>Original</span>
           <label for="original_latitude">latitude:</label>
           <span id="original_latitude" data-bind="text: formatCoord(origLat())"></span>
           <label for="original_longitude">longitude:</label>
           <span id="original_longitude" data-bind="text: formatCoord(origLng())"></span>
         </div>
-        <div id="editable_coords" class="coord_pair">New
+        <div id="editable_coords" class="coord_pair">
+          <span>New</span>
           <label for="new_latitude">latitude:</label>
             <input id="new_latitude" type="number" size="6" step="0.00000001" data-bind="value: newLat"/>
           <label for="new_longitude">longitude:</label>
