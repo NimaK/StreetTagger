@@ -55,6 +55,9 @@
       #original_coords, #editable_coords {
         display: none;
       }
+      #controls {
+        text-align: right;
+      }
       .footer {
         /*flex-shrink: 1;*/
       }
@@ -75,9 +78,9 @@
         </div>
         <div id="editable_coords" class="coord_pair">New
           <label for="new_latitude">latitude:</label>
-            <input id="new_latitude" type="number" size="6" step="0.00000001" data-bind="value: formatCoord(newLat())"/>
+            <input id="new_latitude" type="number" size="6" step="0.00000001" data-bind="value: newLat"/>
           <label for="new_longitude">longitude:</label>
-            <input id="new_longitude" type="number" step="0.00000001" data-bind="value: formatCoord(newLng())"/>
+            <input id="new_longitude" type="number" step="0.00000001" data-bind="value: newLng"/>
         </div>
         <div id="current_image"></div>
       </div>
