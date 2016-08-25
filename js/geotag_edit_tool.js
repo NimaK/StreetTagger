@@ -1,3 +1,4 @@
+
 function CoordEditorViewModel() {
     var viewModel = this;
     this.origLat = ko.observable();
@@ -160,10 +161,12 @@ function CoordEditorViewModel() {
 
 ko.applyBindings(new CoordEditorViewModel());
 
+
 function setupMapViews(pos, zoom, hasOrigPos) {
     map.panTo(pos);
     map.setZoom(zoom);
     streetview.setPosition(pos);
+    streetview.setVisible(true);
     
     if (hasOrigPos) {
         var origPosMarker = new google.maps.Marker({
@@ -180,12 +183,14 @@ function setupMapViews(pos, zoom, hasOrigPos) {
     var editableMarker = new google.maps.Marker({
         position:pos, 
         map: map,
-        draggable: true
+        draggable: true,
+        label: 'X'
     });
     var editableMarkerPano = new google.maps.Marker({
         position:pos, 
         map: streetview,
-        draggable: true
+        draggable: true,
+        label: 'X'
     });
     return {
         'origPosMarker': origPosMarker,
