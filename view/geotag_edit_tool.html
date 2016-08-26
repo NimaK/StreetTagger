@@ -33,7 +33,7 @@
       </div>
     </div>
     <div id="controls" class="controls">
-        <input id="upload_image" type="file" data-bind="event: {change: uploadEvent}"/>
+        <input id="upload_image" type="file" data-bind="event: {change: uploadEvent}" accept=".jpg,.jpeg,.tiff,.tif"/>
         <input id="reset_ui" type="button" data-bind="visible: hasGeotags, enable: isEdited, event: {click: resetImage}" value="Reset"/>
         <input id="download_image" type="button" data-bind="enable: isEdited, event: {click: downloadImage}" value="Download"/>
         <div id="download_div" style="display: none"></div>

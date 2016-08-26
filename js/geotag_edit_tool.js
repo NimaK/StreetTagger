@@ -103,7 +103,7 @@ function CoordEditorViewModel() {
             this.exifData = piexif.load(fileReader.result);
         } catch(e) {
             console.log('Error: invalid file type');
-            alert('Error reading file');
+            alert('Error reading file. Please use an image supporting EXIF data (e.g. .jpeg or .tiff)');
             throw new TypeError('Invalid file');
         }
         var lat = dmsToDecimal(this.exifData.GPS[piexif.GPSIFD.GPSLatitude], this.exifData.GPS[piexif.GPSIFD.GPSLatitudeRef]);
