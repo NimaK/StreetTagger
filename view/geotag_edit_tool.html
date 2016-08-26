@@ -3,70 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Street View side-by-side</title>
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        font-family:sans-serif;
-        font-size: 16px;
-      }
-      input {
-        font-size: 16px;      
-      }
-      .map_ui_body {
-        display: flex;
-        flex-direction: column;
-      }
-      #map {
-        float: left;
-        width: 100%;
-      }
-      .map_panel {
-        width: 100%;
-        min-width: 100%;
-        height: 35%;
-        flex-grow: 1;
-        flex-basis: 35%;
-      }
-      .compare_panel {
-        height:55%;
-        flex-grow: 2;
-        flex-basis: 55%;
-      }
-      .compare_content {
-        width: 50%;
-        float:left;
-        min-height: 100%;
-        display: flex;
-        flex-direction: column;
-      }
-      .coord_pair {
-        padding: 0.2em;
-      }
-      .coord_pair > input {
-        width: 8em;
-      }
-      .image_container {
-        flex-grow: 1;
-        display: flex;
-      }
-      #current_image {
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center center;
-        flex-grow: 1;
-      }
-      #original_coords, #editable_coords {
-        display: none;
-      }
-      #controls {
-        text-align: right;
-      }
-      .footer {
-        /*flex-shrink: 1;*/
-      }
-    </style>
+    <link rel="stylesheet" href="/styles/edit_tool.css" type="text/css">
   </head>
   <body class="map_ui_body">
     <!-- TOP half: map -->
@@ -116,13 +53,8 @@
           zoom: 2
         });
         streetview = new google.maps.StreetViewPanorama(
-            document.getElementById('pano')/*, {
-              position: {lat: -22.93503333, lng: -43.20122778},
-              pov: {
-                heading: 34,
-                pitch: 10
-              }
-        }*/);
+            document.getElementById('pano')
+        );
         map.setStreetView(streetview);
         var controlDiv = document.createElement('div');
 
