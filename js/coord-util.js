@@ -42,7 +42,7 @@ function decimalToDms(decDegrees, isLat) {
 
 function formatCoord(degrees) {
     if (degrees == undefined) {
-        return null;
+        return 'None';
     }
     return degrees.toFixed(8);
 }
