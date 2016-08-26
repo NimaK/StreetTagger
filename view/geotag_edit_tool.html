@@ -47,6 +47,10 @@
       .coord_pair > input {
         width: 8em;
       }
+      .image_container {
+        flex-grow: 1;
+        display: flex;
+      }
       #current_image {
         background-repeat: no-repeat;
         background-size: contain;
@@ -86,12 +90,14 @@
           <label for="new_longitude">longitude:</label>
             <input id="new_longitude" type="number" step="0.00000001" data-bind="value: newLng"/>
         </div>
-        <div id="current_image"></div>
+        <div class="image_container">
+            <div id="current_image"></div>
+        </div>
       </div>
     </div>
     <div id="controls" class="controls">
         <input id="upload_image" type="file" data-bind="event: {change: uploadEvent}"/>
-        <input id="reset_ui" type="button" value="Reset"/>
+        <input id="reset_ui" type="button" data-bind="visible: hasGeotags, enable: isEdited, event: {click: resetImage}" value="Reset"/>
         <input id="download_image" type="button" data-bind="enable: isEdited, event: {click: downloadImage}" value="Download"/>
         <div id="download_div" style="display: none"></div>
     </div>

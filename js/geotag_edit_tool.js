@@ -48,7 +48,7 @@ function CoordEditorViewModel() {
         }
     }, viewModel);
     
-    this.reset = function() {
+    this.clear = function() {
         this.origPosMarker && this.origPosMarker.setMap(null);
         this.origPosMarkerPano && this.origPosMarkerPano.setMap(null);
         this.editableMarker && this.editableMarker.setMap(null);
@@ -75,7 +75,7 @@ function CoordEditorViewModel() {
     
     this.uploadEvent = function(viewmodel, event) {
         var uploadInput = event.target;
-        viewmodel.reset();
+        viewmodel.clear();
         if (uploadInput.files && uploadInput.files[0]) {
             var file = event.target.files[0];
             viewmodel.filename = file.name;
@@ -83,6 +83,19 @@ function CoordEditorViewModel() {
             reader.onload = onFileReaderLoad;
             reader.readAsDataURL(file);
         }
+    }
+    
+    this.resetImage = function(event) {
+        // note: only for images with geotags (hasGeotags())
+        this.newLat(this.origLat());
+        this.newLng(this.origLng());
+        
+        var pos = {lat: this.origLat(), lng: this.origLng()};
+        var zoom = 12;
+        map.panTo(pos);
+        map.setZoom(zoom);
+        streetview.setPosition(pos);
+        streetview.setVisible(true);
     }
     
     this.loadData = function(fileReader) {
@@ -207,9 +220,10 @@ function updateCurrentImageDisplay(image, imageProps) {
     // display the uploaded image
     $('#current_image').css('background-image', 'url("'+image.src+'")');
     
-    // rotate image based on EXIF orientation - TODO needs work (and needs orientation)
+    // rotate image based on EXIF orientation 
     var orientation = imageProps && imageProps.exifOrientation ? imageProps.exifOrientation : 1;
     var rotateBy = '';
+    var scaleBy = null;
     if (orientation !== 1) {
         console.log(orientation);
         if (orientation === 3) {
@@ -217,13 +231,24 @@ function updateCurrentImageDisplay(image, imageProps) {
             $('#current_image').css('transform', 'rotate('+rotateBy+')');
         }
         // TODO: currently transformation by 90 doesn't work as desired
-//        else if (orientation === 6) {
-//          rotateBy = '90deg';
-//        }
-//        else if (orientation === 8) {
-//          rotateBy = '-90deg';
-//        }
-        $('#current_image').css('transform', 'rotate('+rotateBy+')');
+        else if (orientation === 6) {
+          rotateBy = '90deg';
+          //TODO - look into a better way to do this 
+          // image rotates outside containing div (height too tall)
+          // scale by container's height/width
+          scaleBy = $('.image_container').height()/$('.image_container').width();
+          //TODO-also need to rescale on window resize
+        }
+        else if (orientation === 8) {
+          rotateBy = '-90deg';
+          scaleBy = $('.image_container').height()/$('.image_container').width();
+        }
+        
+        var transformSettings = 'rotate('+rotateBy+')';
+        if (scaleBy) {
+          transformSettings += ' scale('+scaleBy+')';
+        }
+        $('#current_image').css('transform', transformSettings);
     }
 }
 
