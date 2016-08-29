@@ -148,7 +148,7 @@ function CoordEditorViewModel() {
         }
         else {
             pos = {lat: viewModel.origLat(), lng: viewModel.origLng()};
-            zoom = 12;
+            zoom = 14;
         }
         
         var markers = setupMapViews(pos, zoom, viewModel.hasGeotags());
