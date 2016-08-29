@@ -25,7 +25,6 @@ function CoordEditorViewModel() {
         if (viewModel.editableMarker) {
             var newLat = new Number(newLatVal);
             // only change if editableMarker has already been created
-            // marker position may be changed twice (position_changed event calls this method, does setPosition with same value - but position_changed only triggered once)
             viewModel.editableMarker.setPosition({
                 'lat': newLat.valueOf(),
                 'lng': viewModel.editableMarker.getPosition().lng()
@@ -40,7 +39,6 @@ function CoordEditorViewModel() {
         if (viewModel.editableMarker) {
             var newLng = new Number(newLngVal);
             // only change if editableMarker has already been created
-            // marker position may be changed twice (position_changed event calls this method, does setPosition with same value - but position_changed only triggered once)
             viewModel.editableMarker.setPosition({
                 'lat': viewModel.editableMarker.getPosition().lat(),
                 'lng': newLng.valueOf()
