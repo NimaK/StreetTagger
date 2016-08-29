@@ -42,6 +42,10 @@ input {
     flex-direction: column;
 }
 
+#compare_heading {
+    padding: 0.2em;
+}
+
 .coord_pair {
     padding: 0.2em;
 }
