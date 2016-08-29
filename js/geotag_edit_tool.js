@@ -21,10 +21,10 @@ function CoordEditorViewModel() {
     
     this.newLat.subscribe(function(newLatVal) {
         this.isEdited(true);
-        // TODO form validation on newLat field - does not belong here...?
+        
         if (viewModel.editableMarker) {
             var newLat = new Number(newLatVal);
-            // only change if editableMarker has already been created
+            // sync viewModel pos with editableMarker (which triggers editableMarkerPano pos to sync)
             viewModel.editableMarker.setPosition({
                 'lat': newLat.valueOf(),
                 'lng': viewModel.editableMarker.getPosition().lng()
@@ -32,13 +32,13 @@ function CoordEditorViewModel() {
         }
     }, viewModel);
     
-    // TODO fix - above and below are nearly identical
+    // TODO - above and below are nearly identical - fix?
     this.newLng.subscribe(function(newLngVal) {
         this.isEdited(true);
-        // TODO form validation on newLng field - does not belong here...?
+        
         if (viewModel.editableMarker) {
             var newLng = new Number(newLngVal);
-            // only change if editableMarker has already been created
+            // sync viewModel pos with editableMarker (which triggers editableMarkerPano pos to sync)
             viewModel.editableMarker.setPosition({
                 'lat': viewModel.editableMarker.getPosition().lat(),
                 'lng': newLng.valueOf()
@@ -117,7 +117,6 @@ function CoordEditorViewModel() {
     }
     
     this.downloadImage = function() {
-        console.log('download image');
         // update EXIF data with new location
         var lat = decimalToDms(viewModel.newLat(), true);
         var lng = decimalToDms(viewModel.newLng(), false);
@@ -158,11 +157,47 @@ function CoordEditorViewModel() {
         viewModel.editableMarker = markers.editableMarker;
         viewModel.editableMarkerPano = markers.editableMarkerPano;
         
+        // setup marker listeners (map, streetview, and viewmodel need to be in sync)
+        // - editableMarker change -> triggers update on editablePanoMarker
+        // - editableMarker change -> triggers update on viewModel newLat/newLng
+        // - editablePanoMarker change -> triggers update on editableMarker
+        // - newLat/newLng change -> triggers update on editableMarker (via KO observable subscribe)
+        
+        viewModel.editableMarker.addListener('position_changed', function() {
+            // update street view marker
+            // check if position has already been synced
+            // (listeners and subscribers call each other)
+            // prevent from change propagating forever 
+            if (viewModel.editableMarkerPano.getPosition().equals(this.position)) {
+                return;
+            }
+            viewModel.editableMarkerPano.setPosition(this.position);
+        });
+        viewModel.editableMarkerPano.addListener('position_changed', function() {
+            // update map marker
+            // check if position has already been synced
+            // (listeners and subscribers call each other)
+            // prevent from change propagating forever 
+            if (viewModel.editableMarker.getPosition().equals(this.position)) {
+                return;
+            }
+            viewModel.editableMarker.setPosition(this.position);
+        });
         viewModel.editableMarker.addListener('position_changed', function() {
             // update viewmodel
+            // check if position has already been synced
+            // (listeners and subscribers call each other)
+            // prevent from change propagating forever 
+            var lat = new Number(viewModel.newLat());
+            var lng = new Number(viewModel.newLng());
+            var vmPos = new google.maps.LatLng({lat: lat.valueOf(), lng: lng.valueOf()});
+            if (this.position.equals(vmPos)) {
+                return;
+            }
             viewModel.newLat(this.position.lat());
             viewModel.newLng(this.position.lng());
         });
+        
         var image = new Image();
         image.src = this.result;
         viewModel.image = image;
@@ -223,17 +258,13 @@ function updateCurrentImageDisplay(image, imageProps) {
     var rotateBy = '';
     var scaleBy = null;
     if (orientation !== 1) {
-        console.log(orientation);
         if (orientation === 3) {
             rotateBy = '180deg';
             $('#current_image').css('transform', 'rotate('+rotateBy+')');
         }
-        // TODO: currently transformation by 90 doesn't work as desired
         else if (orientation === 6) {
           rotateBy = '90deg';
-          //TODO - look into a better way to do this 
-          // image rotates outside containing div (height too tall)
-          // scale by container's height/width
+          // scale by container's height/width to keep it within containing element
           scaleBy = $('.image_container').height()/$('.image_container').width();
           //TODO-also need to rescale on window resize
         }
