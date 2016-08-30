@@ -8,6 +8,7 @@
   <body class="map_ui_body">
     <!-- TOP half: map -->
     <div id="map" class="map_panel"></div>
+    <input id="search_box" class="map_controls" type="text" placeholder="Search">
     <!-- BOTTOM half: comparison view -->
     <div class="compare_panel">
       <div id="pano" class="compare_content"></div>
@@ -54,10 +55,35 @@
         );
         map.setStreetView(streetview);
         var controlDiv = document.createElement('div');
+          
+        var input = document.getElementById('search_box');
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+        // searchBox search results should bias towards current map's view/bounds
+        map.addListener('bounds_changed', function() {
+          searchBox.setBounds(map.getBounds());
+        });
+        // Move the map's view/bounds to the selected search result
+        searchBox.addListener('places_changed', function() {
+            console.log('places_changed searchbox event');
+            var places = searchBox.getPlaces();
+            if (places.length == 0) {
+                return;
+            }
+            var place = places[0];
+            var bounds = new google.maps.LatLngBounds();
+            if (place.geometry.viewport) {
+                bounds.union(place.geometry.viewport);
+            } else {
+                bounds.extend(place.geometry.location);
+            }
+            map.fitBounds(bounds);
+        });
+
       }
     </script>
     <script src="https://code.jquery.com/jquery-3.1.0.js" integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk=" crossorigin="anonymous"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBl4fSPJ0kmCA_fl_rzpp13GXNWqE8Y8uw&callback=initialize"
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBl4fSPJ0kmCA_fl_rzpp13GXNWqE8Y8uw&libraries=places&callback=initialize"
     async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
     <script type="text/javascript" src="/js/coord-util.js"></script>
