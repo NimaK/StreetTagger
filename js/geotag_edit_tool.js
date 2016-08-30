@@ -285,4 +285,5 @@ function clearCurrentImageDisplay() {
     $('#original_coords').hide();
     $('#editable_coords').hide();
     $('#current_image').css('background-image', 'none');
+    $('#current_image').css('transform', '');
 }
