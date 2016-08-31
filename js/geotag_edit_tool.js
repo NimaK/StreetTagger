@@ -168,7 +168,8 @@ function CoordEditorViewModel() {
             // check if position has already been synced
             // (listeners and subscribers call each other)
             // prevent from change propagating forever 
-            if (viewModel.editableMarkerPano.getPosition().equals(this.position)) {
+            if ((!this.position.lat() || !this.position.lng()) ||
+                (viewModel.editableMarkerPano.getPosition().equals(this.position))) {
                 return;
             }
             viewModel.editableMarkerPano.setPosition(this.position);
@@ -178,7 +179,8 @@ function CoordEditorViewModel() {
             // check if position has already been synced
             // (listeners and subscribers call each other)
             // prevent from change propagating forever 
-            if (viewModel.editableMarker.getPosition().equals(this.position)) {
+            if ((!this.position.lat() || !this.position.lng()) ||
+                (viewModel.editableMarker.getPosition().equals(this.position))) {
                 return;
             }
             viewModel.editableMarker.setPosition(this.position);
@@ -191,7 +193,8 @@ function CoordEditorViewModel() {
             var lat = new Number(viewModel.newLat());
             var lng = new Number(viewModel.newLng());
             var vmPos = new google.maps.LatLng({lat: lat.valueOf(), lng: lng.valueOf()});
-            if (this.position.equals(vmPos)) {
+            if ((!this.position.lat() || !this.position.lng()) ||
+                (this.position.equals(vmPos))) {
                 return;
             }
             viewModel.newLat(this.position.lat());
@@ -285,4 +288,5 @@ function clearCurrentImageDisplay() {
     $('#original_coords').hide();
     $('#editable_coords').hide();
     $('#current_image').css('background-image', 'none');
+    $('#current_image').css('transform', '');
 }
