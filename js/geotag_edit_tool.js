@@ -129,8 +129,10 @@ function CoordEditorViewModel() {
         var exifBytes = piexif.dump(this.exifData);
         var newImage = piexif.insert(exifBytes, this.image.src);
         
+        var imgBlob = dataUriUtil.dataUriBase64ToBlob(newImage);
+        var imgUrl = URL.createObjectURL(imgBlob);
         var dl = $('<a>')
-            .attr('href', newImage)
+            .attr('href', imgUrl)
             .attr('download', this.filename);
         $('#download_div').empty().append(dl);
         dl[0].click();
