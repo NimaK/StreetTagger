@@ -2,10 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="styles/edit_tool.css" type="text/css">
-    <title>StreetTagger | Add/edit geotag GPS coordinates to photos using Street View in Google Maps</title>\
     <title>StreetTagger | Add/edit geotag GPS coordinates to photos using Street View in Google Maps</title>
     <meta name="description" content="A tool to add/edit geotag GPS coordinates to photos (EXIF) by using Google Maps and comparing your pictures to Street View. Drag and drop to change the your photo's location. Updates the EXIF data embedded in your image files." />
+    <link rel="stylesheet" href="styles/edit_tool.css" type="text/css">
+    <link rel="stylesheet" href="lib/js/bootstrap/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="lib/js/bootstrap/css/bootstrap-theme.min.css" type="text/css">
   </head>
   <body class="map_ui_body">
     <!-- TOP half: map -->
@@ -40,6 +41,9 @@
         <input id="reset_ui" type="button" data-bind="visible: hasGeotags, enable: isEdited, event: {click: resetImage}" value="Reset"/>
         <input id="download_image" type="button" data-bind="enable: isEdited, event: {click: downloadImage}" value="Download"/>
         <div id="download_div" style="display: none"></div>
+    </div>
+    <div class="footer">
+        <a id="guide">Guide Me</a>
     </div>
 
     <script>
@@ -81,6 +85,14 @@
             }
             map.fitBounds(bounds);
         });
+          
+        $(document).ready(function() {
+            initGuide();
+            
+            $('.footer').click(function() {
+                stepByStepGuide();
+            });
+        });
 
       }
     </script>
@@ -89,8 +101,10 @@
     async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
     <script type="text/javascript" src="js/coord-util.js"></script>
+    <script type="text/javascript" src="js/data-uri-util.js"></script>
     <script type="text/javascript" src="js/geotag_edit_tool.js"></script>
     <script type="text/javascript" src="lib/js/piexif.js"></script>
-    <script type="text/javascript" src="js/data-uri-util.js"></script>
+    <script type="text/javascript" src="lib/js/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://use.fontawesome.com/41910de4c4.js"></script>
   </body>
 </html>

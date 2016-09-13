@@ -292,3 +292,86 @@ function clearCurrentImageDisplay() {
     $('#current_image').css('background-image', 'none');
     $('#current_image').css('transform', '');
 }
+
+function stepByStepGuide() {
+    $('#upload_image').tooltip('show');
+}
+
+function initGuide() {
+    var template = $('<div>').addClass('tooltip-content')
+        .append($('<button>').addClass('tooltip-button').append(
+            $('<span>').addClass('fa fa-times')
+        ))
+        .append($('<button>').addClass('tooltip-button').append(
+            $('<span>').addClass('fa fa-caret-right')
+        ));
+    // Step 1
+    $('#upload_image').tooltip({
+        trigger: 'manual', 
+        placement: 'top',
+        html: true,
+        title: function() {
+            var content = template.clone();
+            content.find('button').has('span.fa-times').click(function() {
+                $('#upload_image').tooltip('hide');
+            });
+            content.find('button').has('span.fa-caret-right').click(function() {
+                $('#upload_image').tooltip('hide');
+                $('#map').tooltip('show');
+            });
+            content.append('Select the image file that you want to update (jpeg or tiff)');
+            return content;
+        }
+    });
+    // Step 2
+    $('#map').tooltip({
+        trigger: 'manual', 
+        placement: 'bottom',
+        html: true,
+        title: function() {
+            var content = template.clone();
+            content.find('button').has('span.fa-times').click(function() {
+                $('#map').tooltip('hide');
+            });
+            content.find('button').has('span.fa-caret-right').click(function() {
+                $('#map').tooltip('hide');
+                $('#pano').tooltip('show');
+            });
+            content.append('Drag and drop the marker (with an "X") to the location where you want the photo to be set');
+            return content;
+        }
+    });
+    // Step 3
+    $('#pano').tooltip({
+        trigger: 'manual', 
+        placement: 'right',
+        html: true,
+        title: function() {
+            var content = template.clone();
+            content.find('button').has('span.fa-times').click(function() {
+                $('#pano').tooltip('hide');
+            });
+            content.find('button').has('span.fa-caret-right').click(function() {
+                $('#pano').tooltip('hide');
+                $('#download_image').tooltip('show');
+            });
+            content.append('You can use the Street View to compare how your photo\'s location compares to the one on Google Maps (Street View is not available in all locations)');
+            return content;
+        }
+    });
+    // Step 4
+    $('#download_image').tooltip({
+        trigger: 'manual', 
+        placement: 'top',
+        html: true,
+        title: function() {
+            var content = template.clone();
+            content.find('button').has('span.fa-times').click(function() {
+                $('#download_image').tooltip('hide');
+            });
+            content.find('button').has('span.fa-caret-right').remove();
+            content.append('Click Download to save your image with the coordinates of the new location (stored in the image\'s EXIF GPS metadata)');
+            return content;
+        }
+    });
+}
