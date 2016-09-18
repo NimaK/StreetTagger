@@ -18,6 +18,7 @@ function CoordEditorViewModel() {
     this.exifData = null;
     this.image = null;
     this.filename = null;
+    this.isImgLoading = ko.observable(false);
     
     this.newLat.subscribe(function(newLatVal) {
         this.isEdited(true);
@@ -77,6 +78,7 @@ function CoordEditorViewModel() {
         if (uploadInput.files && uploadInput.files[0]) {
             var file = event.target.files[0];
             viewmodel.filename = file.name;
+            viewmodel.isImgLoading(true);
             var reader = new FileReader();
             reader.onload = onFileReaderLoad;
             reader.readAsDataURL(file);
@@ -207,6 +209,7 @@ function CoordEditorViewModel() {
         image.src = this.result;
         viewModel.image = image;
         updateCurrentImageDisplay(image, {'exifOrientation': viewModel.orientation()});
+        viewModel.isImgLoading(false);
     };
 }
 

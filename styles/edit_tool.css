@@ -81,6 +81,13 @@ input {
 .image_container {
     flex-grow: 1;
     display: flex;
+    position: relative;
+}
+
+.image_container > i {
+    position: absolute;
+    top: 40%;
+    left: 50%;
 }
 
 #current_image {
