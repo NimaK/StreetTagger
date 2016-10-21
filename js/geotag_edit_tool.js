@@ -213,6 +213,7 @@ function CoordEditorViewModel() {
     };
 }
 
+// from the Knockout documentation:
 ko.extenders.numeric = function(target, precision) {
     //create a writable computed observable to intercept writes to our observable
     var result = ko.pureComputed({
